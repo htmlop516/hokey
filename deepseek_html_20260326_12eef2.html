@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Хоккейный дуэль — Кланы, Друзья, БП, Титулы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            background: linear-gradient(135deg, #0a2f2a 0%, #031a16 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Press Start 2P', monospace;
+            padding: 20px;
+            image-rendering: crisp-edges;
+        }
+
+        .app {
+            width: 1300px;
+            max-width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            border: 2px solid #ffcd7e;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: #1e3a2f;
+            border: 2px solid #ffcd7e;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            padding: 8px 16px;
+            color: #ffecb3;
+            cursor: pointer;
+            transition: 0.05s linear;
+            box-shadow: 3px 3px 0 #0a2a22;
+        }
+        .tab-btn.active {
+            background: #ffb347;
+            color: #1e3a2f;
+            border-color: #ffea9e;
+            transform: translate(2px,2px);
+            box-shadow: 1px 1px 0 #0a2a22;
+        }
+        .tab-content {
+            display: none;
+            animation: fadePixel 0.2s steps(5);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadePixel {
+            0% { opacity: 0; transform: translateY(4px);}
+            100% { opacity: 1; transform: translateY(0);}
+        }
+
+        /* Профиль и карточки */
+        .profile-container, .social-container, .bp-container, .rankings-container {
+            background: #0e201c;
+            border: 3px solid #d4af37;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .avatar-big {
+            width: 110px;
+            height: 110px;
+            background: #2c5a4e;
+            border: 3px solid #ffcd7e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 58px;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        .avatar-big img, .avatar-big video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .nick-input {
+            background: #2c3e3a;
+            border: 2px solid #ffcd7e;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1rem;
+            padding: 6px 12px;
+            color: #ffecb3;
+            width: 100%;
+        }
+        .glowing-title {
+            background: linear-gradient(135deg, #ffd966, #ffaa33, #ffdd88, #ffcc44);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: shimmerGold 2s ease infinite;
+            text-shadow: 0 0 5px rgba(255,215,0,0.5);
+        }
+        @keyframes shimmerGold {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .special-effect {
+            animation: specialGlow 0.5s ease-in-out;
+        }
+        @keyframes specialGlow {
+            0% { text-shadow: 0 0 0 gold; }
+            50% { text-shadow: 0 0 20px gold, 0 0 10px orange; }
+            100% { text-shadow: 0 0 0 gold; }
+        }
+        .friend-code {
+            background: #000000aa;
+            padding: 12px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin: 10px 0;
+            border: 2px solid #ffcd7e;
+            font-weight: bold;
+            color: #ffecb3;
+        }
+        .friend-code span {
+            font-size: 1.5rem;
+            background: #2c3e3a;
+            padding: 4px 12px;
+            display: inline-block;
+            margin-top: 5px;
+            letter-spacing: 3px;
+        }
+        .social-list {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .social-item {
+            background: #1f3a33;
+            margin: 5px 0;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #ffcd7e;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .bp-tier {
+            background: #2f4f48;
+            margin: 8px 0;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #3f6b60;
+            border: 2px solid #ffcd7e;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.6rem;
+            padding: 6px 12px;
+            color: #fff0c0;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 #1a3a32;
+        }
+        button:active {
+            transform: translate(2px,2px);
+            box-shadow: none;
+        }
+        canvas {
+            border: 3px solid #ffcd7e;
+            cursor: none;
+            width: 100%;
+            height: auto;
+            image-rendering: crisp-edges;
+        }
+        .game-mode-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .mode-btn {
+            background: #2e5a4e;
+            font-size: 0.7rem;
+            padding: 8px 18px;
+        }
+        .mode-btn.active {
+            background: #ffaa33;
+            color: black;
+            border-color: gold;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f1f1a;
+            border: 2px solid #ffcd7e;
+            color: #ffdfa5;
+            padding: 8px 20px;
+            font-size: 0.6rem;
+            z-index: 1000;
+            white-space: nowrap;
+            max-width: 90%;
+            white-space: normal;
+            text-align: center;
+        }
+        .search-result {
+            background: #2f4f48;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid gold;
+        }
+        hr {
+            border-color: #ffcd7e;
+            margin: 15px 0;
+        }
+        .rank-item {
+            background: #1f3a33;
+            margin: 5px 0;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #ffcd7e;
+        }
+        .skin-item {
+            display: inline-block;
+            margin: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .skin-item.selected {
+            border-color: gold;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="menu">🏠 МЕНЮ</button>
+        <button class="tab-btn" data-tab="profile">👤 ПРОФИЛЬ</button>
+        <button class="tab-btn" data-tab="social">👥 ДРУЗЬЯ & КЛАНЫ</button>
+        <button class="tab-btn" data-tab="bp">🎫 БП</button>
+        <button class="tab-btn" data-tab="rankings">🏆 ТОПЫ</button>
+        <button class="tab-btn" data-tab="game">🏒 ИГРАТЬ</button>
+    </div>
+
+    <!-- МЕНЮ -->
+    <div id="menuTab" class="tab-content active">
+        <div style="text-align:center; padding:40px 20px;">
+            <h1 style="font-size:2rem; margin-bottom:20px;">❄️ ХОККЕЙНЫЙ ДУЭЛЬ ❄️</h1>
+            <div style="background:#0e201c; border:3px solid #ffcd7e; padding:24px; margin:20px auto; width:85%;">
+                <p id="menuNick" style="font-size:1rem;">Игрок</p>
+                <p>🏆 ЭЛО: <span id="menuElo">1000</span> &nbsp;| 🔥 Серия: <span id="menuStreak">0</span></p>
+                <p id="menuTitle" class="glowing-title" style="margin-top:12px;">✨ Титул ✨</p>
+                <p>🎫 БП Уровень: <span id="menuBpLvl">1</span></p>
+                <p>👥 Друзей: <span id="menuFriendsCount">0</span></p>
+            </div>
+            <button id="playNowBtn" class="mode-btn" style="font-size:1rem; padding:12px 30px;">▶ ИГРАТЬ</button>
+        </div>
+    </div>
+
+    <!-- ПРОФИЛЬ -->
+    <div id="profileTab" class="tab-content">
+        <div class="profile-container">
+            <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:center;">
+                <div class="avatar-big" id="profileAvatar">🏒</div>
+                <div style="flex:1;">
+                    <input type="text" id="profileNick" class="nick-input" maxlength="16">
+                    <div class="friend-code">
+                        🔑 ВАШ КОД ДРУЖБЫ:<br>
+                        <span id="friendCodeDisplay">XXXXXX</span>
+                    </div>
+                    <div>⭐ ЭЛО: <span id="profileElo">1000</span> &nbsp;| 🔥 Серия: <span id="profileStreak">0</span></div>
+                    <div id="profileTitle" class="glowing-title" style="margin-top:8px;"></div>
+                </div>
+            </div>
+            <div style="margin-top:20px;">
+                <button id="uploadPhotoBtn">📸 ЗАГРУЗИТЬ PNG/GIF</button>
+                <button id="resetAvatarBtn">🗑 СБРОСИТЬ АВАТАР</button>
+                <input type="file" id="avatarUpload" accept="image/*,image/gif,video/mp4" style="display:none">
+            </div>
+            <hr>
+            <div>
+                <h3>🏅 ЗОЛОТЫЕ ТИТУЛЫ (ЗА ЭЛО)</h3>
+                <div id="titlesList" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
+            </div>
+            <div style="margin-top:20px;">
+                <h3>🎨 СКИНЫ ПЕРСОНАЖА (ИЗ БП)</h3>
+                <div id="skinsList" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ДРУЗЬЯ И КЛАНЫ -->
+    <div id="socialTab" class="tab-content">
+        <div class="social-container">
+            <h3>👥 ДРУЗЬЯ</h3>
+            <div style="display:flex; gap:10px; margin:10px 0; flex-wrap:wrap;">
+                <input type="text" id="addFriendCode" placeholder="Введите код друга" style="flex:2; background:#2c3e3a; border:2px solid #ffcd7e; color:white; padding:8px; font-family:monospace;">
+                <button id="addFriendBtn">➕ ДОБАВИТЬ ДРУГА</button>
+                <button id="searchFriendBtn">🔍 НАЙТИ ПО КОДУ</button>
+            </div>
+            <div id="searchResult" style="margin-bottom:10px;"></div>
+            <div id="friendsList" class="social-list"></div>
+            
+            <hr>
+            <h3 style="margin-top:20px;">🏰 КЛАН</h3>
+            <div id="clanInfo" style="background:#1f3a33; padding:10px; margin:10px 0;">У вас нет клана. Создайте или вступите по коду.</div>
+            <div style="display:flex; gap:10px; margin:10px 0; flex-wrap:wrap;">
+                <input type="text" id="clanCodeInput" placeholder="Код клана для вступления" style="flex:2; background:#2c3e3a; border:2px solid #ffcd7e; color:white; padding:8px;">
+                <button id="joinClanBtn">🔗 ВСТУПИТЬ В КЛАН</button>
+                <button id="createClanBtn">✨ СОЗДАТЬ КЛАН</button>
+            </div>
+            <div id="clanMembersList" class="social-list"></div>
+        </div>
+    </div>
+
+    <!-- БОЕВОЙ ПРОПУСК -->
+    <div id="bpTab" class="tab-content">
+        <div class="bp-container">
+            <h2>🎫 БОЕВОЙ ПРОПУСК</h2>
+            <div id="bpProgress" style="margin:15px 0;">Уровень: <span id="bpLevel">1</span> / 10 (XP: <span id="bpXP">0</span>/100)</div>
+            <div id="bpRewards"></div>
+            <div>⭐ Получайте опыт за матчи (победа +20 XP, поражение +5 XP)</div>
+            <div>🏆 Бонусы: скины, титулы, Эло, эффекты!</div>
+        </div>
+    </div>
+
+    <!-- ТОПЫ -->
+    <div id="rankingsTab" class="tab-content">
+        <div class="rankings-container">
+            <h2>🏆 ТАБЛИЦА ЛИДЕРОВ</h2>
+            <div id="rankingsList" class="social-list"></div>
+            <div style="margin-top:15px;">* Топ формируется по Эло среди всех зарегистрированных профилей</div>
+        </div>
+    </div>
+
+    <!-- ИГРА -->
+    <div id="gameTab" class="tab-content">
+        <div class="game-mode-selector">
+            <button id="modeBot" class="mode-btn active">🤖 ПРОТИВ БОТА</button>
+            <button id="modeMulti" class="mode-btn">👥 МУЛЬТИПЛЕЕР (2 игрока)</button>
+        </div>
+        <div class="game-panel" style="text-align:center;">
+            <div class="game-header" style="background:#0e201c; border:2px solid #ffcd7e; padding:12px; display:flex; justify-content:space-between;">
+                <div>👤 <span id="gamePlayer1Nick">Игрок 1</span></div>
+                <div class="score-game"><span id="gameScore1">0</span> : <span id="gameScore2">0</span></div>
+                <div id="gamePlayer2Label">🤖 БОТ</div>
+            </div>
+            <canvas id="gameCanvas" width="1100" height="620" style="width:100%; max-width:1100px; aspect-ratio:1100/620"></canvas>
+            <div style="margin-top:15px;">
+                <button id="resetGameBtn">🔄 СБРОС МАТЧА</button>
+                <button id="backToMenuGameBtn">🏠 В МЕНЮ</button>
+            </div>
+            <div id="multiplayerHint" style="font-size:0.5rem; margin-top:10px; color:#ffcd7e;">Мультиплеер: Игрок 1 (слева) - мышь, Игрок 2 (справа) - стрелки вверх/вниз</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ------------------- БАЗОВЫЙ ПРОФИЛЬ И ДАННЫЕ -------------------
+    let profile = {
+        nick: "Хоккеист",
+        avatarType: "emoji",
+        avatarData: "🏒",
+        elo: 1000,
+        streak: 0,
+        activeTitle: "🧸 Новичок",
+        friendCode: "",
+        friends: [],
+        clan: { name: "", code: "", members: [] },
+        bp: { level: 1, xp: 0 },
+        unlockedSkins: ["🏒 Обычный"], // скины из БП
+        activeSkin: "🏒 Обычный",
+        specialEffect: false
+    };
+
+    let allProfiles = {}; // key = friendCode
+
+    const TITLES = [
+        { name: "🧸 Новичок", minElo: 0, effect: false },
+        { name: "🏒 Любитель", minElo: 1000, effect: false },
+        { name: "⚡ Мастер клюшки", minElo: 1150, effect: false },
+        { name: "🔥 Ледяной викинг", minElo: 1300, effect: false },
+        { name: "👑 Хоккейный бог", minElo: 1500, effect: false },
+        { name: "❄️ Ледяной дракон", minElo: 1700, effect: false },
+        { name: "🏆 Легенда арены", minElo: 2000, effect: false }
+    ];
+
+    const BP_REWARDS = {
+        1: { desc: "✨ +500 Эло ✨", elo: 500, skin: null, title: null, effect: false },
+        2: { desc: "🏒 Скин: Золотая клюшка", elo: 0, skin: "🏒 Золотая клюшка", title: null, effect: false },
+        3: { desc: "🎫 +10% к эло за победу", elo: 0, skin: null, title: null, effect: false },
+        4: { desc: "👑 Титул: Стальной легионер", elo: 0, skin: null, title: "⚔️ Стальной легионер", effect: false },
+        5: { desc: "🌟 +1000 Эло", elo: 1000, skin: null, title: null, effect: false },
+        6: { desc: "❄️ Скин: Ледяной дракон", elo: 0, skin: "❄️ Ледяной дракон", title: null, effect: false },
+        7: { desc: "🔥 Удвоение серии побед", elo: 0, skin: null, title: null, effect: false },
+        8: { desc: "🏆 Титул: Покоритель арены", elo: 0, skin: null, title: "🏆 Покоритель арены", effect: false },
+        9: { desc: "⚡ Скин: Молния", elo: 0, skin: "⚡ Молния", title: null, effect: false },
+        10: { desc: "👑 ТИТУЛ: ЛЕГЕНДА (золотой + эффект)", elo: 0, skin: null, title: "👑 ЛЕГЕНДА", effect: true }
+    };
+
+    // Генерация уникального кода
+    function generateFriendCode() {
+        let code;
+        do {
+            code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        } while (allProfiles[code] && code !== profile.friendCode);
+        return code;
+    }
+
+    function saveAllData() {
+        localStorage.setItem("hockey_social_v4", JSON.stringify(profile));
+        localStorage.setItem("hockey_all_profiles_v4", JSON.stringify(allProfiles));
+    }
+
+    function loadAllData() {
+        let savedProfile = localStorage.getItem("hockey_social_v4");
+        if(savedProfile) {
+            let data = JSON.parse(savedProfile);
+            profile = { ...profile, ...data };
+        }
+        let savedAll = localStorage.getItem("hockey_all_profiles_v4");
+        if(savedAll) {
+            allProfiles = JSON.parse(savedAll);
+        }
+        if(!profile.friendCode) profile.friendCode = generateFriendCode();
+        if(!profile.friends) profile.friends = [];
+        if(!profile.clan) profile.clan = { name: "", code: "", members: [] };
+        if(!profile.bp) profile.bp = { level: 1, xp: 0 };
+        if(!profile.unlockedSkins) profile.unlockedSkins = ["🏒 Обычный"];
+        if(!profile.activeSkin) profile.activeSkin = "🏒 Обычный";
+        
+        // Обновляем профиль в базе
+        allProfiles[profile.friendCode] = {
+            nick: profile.nick,
+            elo: profile.elo,
+            avatarType: profile.avatarType,
+            avatarData: profile.avatarData,
+            activeTitle: profile.activeTitle,
+            friendCode: profile.friendCode,
+            skin: profile.activeSkin
+        };
+        saveAllData();
+        updateTitleByElo();
+    }
+
+    function updateTitleByElo() {
+        let unlocked = TITLES.filter(t => profile.elo >= t.minElo);
+        let best = unlocked[unlocked.length-1] || TITLES[0];
+        if(!profile.activeTitle || !unlocked.find(t=>t.name===profile.activeTitle)) {
+            profile.activeTitle = best.name;
+        }
+        // Проверка на особый эффект от БП
+        if(profile.bp.level >= 10) {
+            profile.specialEffect = true;
+        } else {
+            profile.specialEffect = false;
+        }
+    }
+
+    function addXP(amount) {
+        profile.bp.xp += amount;
+        let leveled = false;
+        while(profile.bp.xp >= 100 && profile.bp.level < 10) {
+            profile.bp.xp -= 100;
+            profile.bp.level++;
+            leveled = true;
+            let reward = BP_REWARDS[profile.bp.level];
+            showToast(`🎉 БП уровень ${profile.bp.level}! Награда: ${reward.desc}`);
+            if(reward.elo) profile.elo += reward.elo;
+            if(reward.skin && !profile.unlockedSkins.includes(reward.skin)) {
+                profile.unlockedSkins.push(reward.skin);
+                showToast(`🎨 Получен скин: ${reward.skin}!`);
+            }
+            if(reward.title) {
+                // добавляем титул (временный)
+                TITLES.push({ name: reward.title, minElo: 0, effect: reward.effect });
+                profile.activeTitle = reward.title;
+                if(reward.effect) profile.specialEffect = true;
+            }
+            updateTitleByElo();
+        }
+        if(profile.bp.level >= 10) profile.bp.xp = 0;
+        if(leveled) {
+            allProfiles[profile.friendCode] = {
+                ...allProfiles[profile.friendCode],
+                elo: profile.elo,
+                activeTitle: profile.activeTitle
+            };
+        }
+        saveAllData();
+        updateUI();
+    }
+
+    function updateUI() {
+        document.getElementById("menuNick").innerText = profile.nick;
+        document.getElementById("menuElo").innerText = profile.elo;
+        document.getElementById("menuStreak").innerText = profile.streak;
+        document.getElementById("menuBpLvl").innerText = profile.bp.level;
+        document.getElementById("menuFriendsCount").innerText = profile.friends.length;
+        let titleObj = TITLES.find(t=>t.name===profile.activeTitle) || TITLES[0];
+        document.getElementById("menuTitle").innerHTML = `✨ ${titleObj.name} ✨`;
+        document.getElementById("profileNick").value = profile.nick;
+        document.getElementById("profileElo").innerText = profile.elo;
+        document.getElementById("profileStreak").innerText = profile.streak;
+        document.getElementById("profileTitle").innerHTML = titleObj.name;
+        document.getElementById("friendCodeDisplay").innerText = profile.friendCode;
+        document.getElementById("bpLevel").innerText = profile.bp.level;
+        document.getElementById("bpXP").innerText = profile.bp.xp;
+        updateAvatarDisplay();
+        renderTitles();
+        renderFriends();
+        renderClan();
+        renderBP();
+        renderRankings();
+        renderSkins();
+        document.getElementById("gamePlayer1Nick").innerText = profile.nick;
+        // Если есть особый эффект - добавляем класс анимации
+        if(profile.specialEffect) {
+            document.querySelectorAll(".glowing-title").forEach(el => {
+                el.classList.add("special-effect");
+                setTimeout(() => el.classList.remove("special-effect"), 500);
+            });
+        }
+    }
+
+    function updateAvatarDisplay() {
+        let avatarDiv = document.getElementById("profileAvatar");
+        avatarDiv.innerHTML = "";
+        if(profile.avatarType === "image" && profile.avatarData) {
+            if(profile.avatarData.startsWith("data:image") || profile.avatarData.startsWith("data:video")) {
+                if(profile.avatarData.includes("gif") || profile.avatarData.includes("video")) {
+                    let vid = document.createElement("video");
+                    vid.src = profile.avatarData;
+                    vid.autoplay = true;
+                    vid.loop = true;
+                    vid.muted = true;
+                    vid.style.width = "100%";
+                    vid.style.height = "100%";
+                    vid.style.objectFit = "cover";
+                    avatarDiv.appendChild(vid);
+                } else {
+                    let img = document.createElement("img");
+                    img.src = profile.avatarData;
+                    img.style.width = "100%";
+                    img.style.height = "100%";
+                    img.style.objectFit = "cover";
+                    avatarDiv.appendChild(img);
+                }
+            } else {
+                avatarDiv.innerText = profile.avatarData;
+            }
+        } else {
+            avatarDiv.innerText = profile.avatarData || "🏒";
+        }
+    }
+
+    function renderTitles() {
+        let container = document.getElementById("titlesList");
+        container.innerHTML = "";
+        TITLES.forEach(t => {
+            let unlocked = profile.elo >= t.minElo;
+            let div = document.createElement("div");
+            div.style.background = unlocked ? "#3a6a5e" : "#2f3e3a";
+            div.style.border = profile.activeTitle === t.name ? "2px solid gold" : "1px solid #ffcd7e";
+            div.style.padding = "4px 12px";
+            div.style.fontSize = "0.6rem";
+            div.style.cursor = unlocked ? "pointer" : "default";
+            div.style.borderRadius = "8px";
+            div.innerHTML = t.name;
+            if(unlocked) {
+                div.onclick = () => {
+                    profile.activeTitle = t.name;
+                    if(t.effect) profile.specialEffect = true;
+                    saveAllData();
+                    updateUI();
+                    showToast(`Титул "${t.name}" выбран!`);
+                };
+            }
+            container.appendChild(div);
+        });
+    }
+
+    function renderSkins() {
+        let container = document.getElementById("skinsList");
+        container.innerHTML = "";
+        profile.unlockedSkins.forEach(skin => {
+            let div = document.createElement("div");
+            div.className = `skin-item ${profile.activeSkin === skin ? 'selected' : ''}`;
+            div.style.background = "#2c5a4e";
+            div.style.padding = "8px 12px";
+            div.style.borderRadius = "8px";
+            div.style.fontSize = "0.7rem";
+            div.innerText = skin;
+            div.onclick = () => {
+                profile.activeSkin = skin;
+                saveAllData();
+                renderSkins();
+                showToast(`Скин "${skin}" выбран!`);
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function renderFriends() {
+        let container = document.getElementById("friendsList");
+        container.innerHTML = "";
+        if(profile.friends.length === 0) {
+            container.innerHTML = "<div style='padding:8px; text-align:center;'>У вас пока нет друзей. Добавьте по коду!</div>";
+            return;
+        }
+        profile.friends.forEach(f => {
+            let div = document.createElement("div");
+            div.className = "social-item";
+            div.innerHTML = `
+                <span>${f.nick} (${f.code}) 🏆${f.elo}</span>
+                <div>
+                    <button class="viewFriendBtn" data-code="${f.code}">👁️ ПРОФИЛЬ</button>
+                    <button class="removeFriendBtn" data-code="${f.code}">❌</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        document.querySelectorAll(".viewFriendBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                let code = btn.getAttribute("data-code");
+                viewProfileByCode(code);
+            });
+        });
+        document.querySelectorAll(".removeFriendBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                let code = btn.getAttribute("data-code");
+                profile.friends = profile.friends.filter(f => f.code !== code);
+                saveAllData();
+                renderFriends();
+                showToast("Друг удалён");
+            });
+        });
+    }
+
+    function viewProfileByCode(code) {
+        if(code === profile.friendCode) {
+            showToast("Это ваш профиль!");
+            return;
+        }
+        let friend = profile.friends.find(f => f.code === code);
+        if(friend) {
+            showToast(`${friend.nick} | ЭЛО: ${friend.elo} | Титул: ${friend.activeTitle || "Нет"}`, 3000);
+        } else {
+            let found = allProfiles[code];
+            if(found) {
+                showToast(`👤 ${found.nick} | 🏆 ЭЛО: ${found.elo} | ${found.activeTitle || "Без титула"}`, 4000);
+            } else {
+                showToast("Пользователь с таким кодом не найден", 2000);
+            }
+        }
+    }
+
+    function renderClan() {
+        let clanDiv = document.getElementById("clanInfo");
+        let membersDiv = document.getElementById("clanMembersList");
+        if(profile.clan.name) {
+            clanDiv.innerHTML = `🏰 Клан: ${profile.clan.name} (код: ${profile.clan.code})<br>👥 Участников: ${profile.clan.members.length+1}`;
+            membersDiv.innerHTML = `<div class="social-item"><span>👑 ${profile.nick} (создатель)</span></div>`;
+            profile.clan.members.forEach(m => {
+                let mdiv = document.createElement("div");
+                mdiv.className = "social-item";
+                mdiv.innerHTML = `<span>👤 ${m.nick} (${m.code})</span>`;
+                membersDiv.appendChild(mdiv);
+            });
+        } else {
+            clanDiv.innerHTML = "У вас нет клана. Создайте свой или вступите по коду.";
+            membersDiv.innerHTML = "";
+        }
+    }
+
+    function renderBP() {
+        let container = document.getElementById("bpRewards");
+        container.innerHTML = "";
+        for(let i=1; i<=10; i++) {
+            let unlocked = profile.bp.level >= i;
+            let reward = BP_REWARDS[i];
+            let div = document.createElement("div");
+            div.className = "bp-tier";
+            div.style.background = unlocked ? "#3f8b6e" : "#2f4f48";
+            div.innerHTML = `<span>Уровень ${i}</span><span>${reward.desc}</span>${unlocked ? " ✅" : " 🔒"}`;
+            container.appendChild(div);
+        }
+    }
+
+    function renderRankings() {
+        let container = document.getElementById("rankingsList");
+        container.innerHTML = "";
+        let sorted = Object.values(allProfiles).sort((a,b) => b.elo - a.elo).slice(0, 10);
+        if(sorted.length === 0) {
+            container.innerHTML = "<div>Нет данных для топа</div>";
+            return;
+        }
+        sorted.forEach((p, idx) => {
+            let div = document.createElement("div");
+            div.className = "rank-item";
+            div.innerHTML = `<span>${idx+1}. ${p.nick}</span><span>🏆 ${p.elo}</span>`;
+            container.appendChild(div);
+        });
+    }
+
+    function searchByCode(code) {
+        let resultDiv = document.getElementById("searchResult");
+        if(!code) {
+            resultDiv.innerHTML = "";
+            return;
+        }
+        if(code === profile.friendCode) {
+            resultDiv.innerHTML = `<div class="search-result">✅ Это ваш собственный код!</div>`;
+            return;
+        }
+        let found = allProfiles[code];
+        if(found) {
+            let alreadyFriend = profile.friends.some(f => f.code === code);
+            resultDiv.innerHTML = `
+                <div class="search-result">
+                    <strong>${found.nick}</strong> | ЭЛО: ${found.elo} | ${found.activeTitle || ""}
+                    ${!alreadyFriend ? `<button id="quickAddFriend" style="margin-left:10px;">➕ ДОБАВИТЬ</button>` : "<span style='margin-left:10px;'>✅ Уже в друзьях</span>"}
+                </div>
+            `;
+            if(!alreadyFriend) {
+                document.getElementById("quickAddFriend")?.addEventListener("click", () => {
+                    addFriendByCode(code);
+                });
+            }
+        } else {
+            resultDiv.innerHTML = `<div class="search-result">❌ Пользователь с кодом ${code} не найден</div>`;
+        }
+    }
+
+    function addFriendByCode(code) {
+        if(code === profile.friendCode) { showToast("Нельзя добавить себя"); return; }
+        if(profile.friends.find(f=>f.code===code)) { showToast("Уже в друзьях"); return; }
+        let found = allProfiles[code];
+        if(found) {
+            let newFriend = {
+                code: code,
+                nick: found.nick,
+                elo: found.elo,
+                avatarType: found.avatarType,
+                activeTitle: found.activeTitle
+            };
+            profile.friends.push(newFriend);
+            saveAllData();
+            renderFriends();
+            showToast(`Друг ${found.nick} добавлен!`);
+            document.getElementById("searchResult").innerHTML = "";
+            document.getElementById("addFriendCode").value = "";
+        } else {
+            showToast("Пользователь не найден");
+        }
+    }
+
+    // ------------------- ИГРОВАЯ ЛОГИКА -------------------
+    let gameMode = "bot";
+    let gameActive = true;
+    let player1Score = 0, player2Score = 0;
+    let winLimit = 5;
+    let W=1100, H=620;
+    let canvas, ctx;
+    let puck = { x: W/2, y: H/2, vx: 2.5, vy: 1.8, r: 10 };
+    let player1 = { x: 150, y: H/2, r: 22, prevX: 150, prevY: H/2 };
+    let player2 = { x: W-150, y: H/2, r: 22, prevX: W-150, prevY: H/2 };
+    let goalFlash = false;
+    let mouseX = player1.x, mouseY = player1.y;
+
+    let settings = {
+        friction: 0.994,
+        bounceForce: 1.3,
+        aiSpeed: 4.5
+    };
+
+    function initGameCanvas() {
+        canvas = document.getElementById("gameCanvas");
+        ctx = canvas.getContext("2d");
+        W = canvas.width = 1100;
+        H = canvas.height = 620;
+        resetMatch();
+        canvas.addEventListener("mousemove", (e) => {
+            if(!gameActive) return;
+            let rect = canvas.getBoundingClientRect();
+            let sx = canvas.width/rect.width, sy = canvas.height/rect.height;
+            let mx = (e.clientX - rect.left)*sx;
+            let my = (e.clientY - rect.top)*sy;
+            mx = Math.min(W/2 - player1.r - 5, Math.max(player1.r + 10, mx));
+            my = Math.min(H - player1.r, Math.max(player1.r, my));
+            player1.x = mx; player1.y = my;
+            clampPlayer(player1, true);
+        });
+        window.addEventListener("keydown", (e) => {
+            if(gameMode !== "multiplayer") return;
+            if(!gameActive) return;
+            if(e.key === "ArrowUp") player2.y -= 15;
+            if(e.key === "ArrowDown") player2.y += 15;
+            clampPlayer(player2, false);
+        });
+        requestAnimationFrame(gameLoop);
+    }
+
+    function clampPlayer(p, isLeft) {
+        if(isLeft) p.x = Math.min(W/2 - p.r - 3, Math.max(p.r + 8, p.x));
+        else p.x = Math.max(W/2 + p.r + 3, Math.min(W - p.r - 5, p.x));
+        p.y = Math.min(H - p.r - 2, Math.max(p.r + 2, p.y));
+    }
+
+    function resetMatch() {
+        player1Score = 0; player2Score = 0;
+        gameActive = true;
+        updateScoreUI();
+        resetPuckAndPlayers();
+    }
+
+    function resetPuckAndPlayers() {
+        puck.x = W/2; puck.y = H/2;
+        let angle = Math.random() * Math.PI * 2;
+        let spd = 2.8 + Math.random() * 1.2;
+        puck.vx = Math.cos(angle) * spd;
+        puck.vy = Math.sin(angle) * spd;
+        player1.x = Math.min(W/2 - player1.r - 8, Math.max(player1.r + 12, mouseX));
+        player1.y = Math.min(H - player1.r, Math.max(player1.r, mouseY));
+        player2.x = Math.max(W/2 + player2.r + 8, Math.min(W - player2.r - 5, W-120));
+        player2.y = H/2;
+        clampPlayer(player1, true);
+        clampPlayer(player2, false);
+        player1.prevX = player1.x; player1.prevY = player1.y;
+        player2.prevX = player2.x; player2.prevY = player2.y;
+    }
+
+    function handleCollision(puck, player) {
+        let dx = puck.x - player.x, dy = puck.y - player.y;
+        let dist = Math.hypot(dx, dy);
+        let minD = puck.r + player.r;
+        if(dist < minD) {
+            let angle = Math.atan2(dy, dx);
+            let overlap = minD - dist;
+            puck.x += Math.cos(angle) * overlap;
+            puck.y += Math.sin(angle) * overlap;
+            let pvx = player.x - (player.prevX || player.x);
+            let pvy = player.y - (player.prevY || player.y);
+            player.prevX = player.x; player.prevY = player.y;
+            let newVx = puck.vx + pvx * 0.5;
+            let newVy = puck.vy + pvy * 0.5;
+            let spd = Math.hypot(newVx, newVy);
+            if(spd > 8) { newVx = newVx/spd*8; newVy = newVy/spd*8; }
+            puck.vx = newVx; puck.vy = newVy;
+            puck.vx += Math.cos(angle) * settings.bounceForce;
+            puck.vy += Math.sin(angle) * settings.bounceForce;
+        }
+    }
+
+    function updateAI() {
+        if(gameMode !== "bot") return;
+        let targetX = player2.x, targetY = puck.y;
+        if(puck.x > W/2) targetX = puck.x - 15;
+        else targetX = W/2 + player2.r + 15;
+        targetX = Math.min(W - player2.r - 5, Math.max(W/2 + player2.r + 5, targetX));
+        let dx = targetX - player2.x, dy = targetY - player2.y;
+        let len = Math.hypot(dx, dy);
+        let move = Math.min(settings.aiSpeed, len);
+        if(len>0.01) { player2.x += dx/len * move; player2.y += dy/len * move; }
+        clampPlayer(player2, false);
+    }
+
+    function updatePhysics() {
+        if(!gameActive) return;
+        puck.x += puck.vx; puck.y += puck.vy;
+        puck.vx *= settings.friction; puck.vy *= settings.friction;
+        if(puck.y - puck.r <= 0) { puck.y = puck.r; puck.vy = -puck.vy; }
+        if(puck.y + puck.r >= H) { puck.y = H - puck.r; puck.vy = -puck.vy; }
+        if(puck.x - puck.r < 0) puck.x = puck.r;
+        if(puck.x + puck.r > W) puck.x = W - puck.r;
+        handleCollision(puck, player1);
+        handleCollision(puck, player2);
+        player1.prevX = player1.x; player1.prevY = player1.y;
+        player2.prevX = player2.x; player2.prevY = player2.y;
+    }
+
+    function checkGoals() {
+        if(!gameActive) return;
+        if(puck.x - puck.r <= 0) {
+            player2Score++;
+            updateScoreUI();
+            goalFlash=true; setTimeout(()=>goalFlash=false,200);
+            if(player2Score >= winLimit) endMatch(false);
+            else resetPuckAndPlayers();
+        } else if(puck.x + puck.r >= W) {
+            player1Score++;
+            updateScoreUI();
+            goalFlash=true; setTimeout(()=>goalFlash=false,200);
+            if(player1Score >= winLimit) endMatch(true);
+            else resetPuckAndPlayers();
+        }
+    }
+
+    function endMatch(player1Win) {
+        gameActive = false;
+        if(gameMode === "bot") {
+            if(player1Win) {
+                let gain = 25 + Math.min(profile.streak * 3, 20);
+                // бонус от БП уровня 3
+                if(profile.bp.level >= 3) gain = Math.floor(gain * 1.1);
+                profile.elo += gain;
+                profile.streak++;
+                addXP(20);
+                showToast(`ПОБЕДА! +${gain} ЭЛО, +20 XP`);
+            } else {
+                profile.elo = Math.max(0, profile.elo - 25);
+                profile.streak = 0;
+                addXP(5);
+                showToast(`ПОРАЖЕНИЕ... -25 ЭЛО, +5 XP`);
+            }
+            updateTitleByElo();
+            allProfiles[profile.friendCode] = {
+                ...allProfiles[profile.friendCode],
+                elo: profile.elo,
+                activeTitle: profile.activeTitle,
+                nick: profile.nick
+            };
+            saveAllData();
+            updateUI();
+        } else {
+            showToast(`Матч окончен! Победитель: ${player1Win ? profile.nick : "Игрок 2"}`, 2500);
+        }
+    }
+
+    function updateScoreUI() {
+        document.getElementById("gameScore1").innerText = player1Score;
+        document.getElementById("gameScore2").innerText = player2Score;
+    }
+
+    function draw() {
+        if(!ctx) return;
+        ctx.fillStyle = "#1f8a6b";
+        ctx.fillRect(0,0,W,H);
+        ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H);
+        ctx.strokeStyle="#f7ecc7"; ctx.lineWidth=4; ctx.setLineDash([8,12]); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(W/2,H/2,40,0,2*Math.PI); ctx.strokeStyle="#ffdd99"; ctx.stroke();
+        
+        // Игрок 1 с активным скином
+        ctx.beginPath(); ctx.arc(player1.x, player1.y, player1.r-1,0,2*Math.PI);
+        ctx.fillStyle = "#3f8bcf"; ctx.fill();
+        ctx.font = "20px monospace"; ctx.fillStyle="white";
+        let skinChar = profile.activeSkin.includes("Золотая") ? "🏒" : 
+                       profile.activeSkin.includes("Дракон") ? "🐉" :
+                       profile.activeSkin.includes("Молния") ? "⚡" : "🏒";
+        ctx.fillText(skinChar, player1.x-12, player1.y+10);
+        ctx.fillStyle="#ffecb3"; ctx.font="bold 12px 'Press Start 2P'";
+        ctx.fillText(profile.nick.slice(0,3), player1.x-12, player1.y-14);
+        
+        // Игрок 2 / бот
+        ctx.beginPath(); ctx.arc(player2.x, player2.y, player2.r-1,0,2*Math.PI);
+        ctx.fillStyle = gameMode==="bot" ? "#b55a3c" : "#9b59b6";
+        ctx.fill();
+        ctx.fillStyle="white";
+        ctx.fillText(gameMode==="bot"?"🤖":"👥", player2.x-12, player2.y+10);
+        
+        // Шайба
+        ctx.beginPath(); ctx.arc(puck.x, puck.y, puck.r-1,0,2*Math.PI);
+        ctx.fillStyle="#2b241c"; ctx.fill();
+        ctx.fillStyle="#d4af37"; ctx.font="bold 18px monospace";
+        ctx.fillText("●", puck.x-7, puck.y+6);
+        
+        if(goalFlash) { ctx.fillStyle="rgba(255,240,150,0.5)"; ctx.fillRect(0,0,W,H); }
+        if(!gameActive) {
+            ctx.fillStyle="rgba(0,0,0,0.7)"; ctx.fillRect(0,0,W,H);
+            ctx.fillStyle="#ffdfaa"; ctx.font="bold 18px 'Press Start 2P'";
+            ctx.fillText("МАТЧ ЗАВЕРШЁН", W/2-160, H/2);
+        }
+    }
+
+    let animFrame;
+    function gameLoop() {
+        if(gameActive) {
+            if(gameMode === "bot") updateAI();
+            updatePhysics();
+            checkGoals();
+        }
+        draw();
+        animFrame = requestAnimationFrame(gameLoop);
+    }
+
+    // ------------------- СОБЫТИЯ -------------------
+    function initEvents() {
+        document.getElementById("modeBot").addEventListener("click", () => {
+            gameMode = "bot";
+            document.getElementById("modeBot").classList.add("active");
+            document.getElementById("modeMulti").classList.remove("active");
+            document.getElementById("gamePlayer2Label").innerText = "🤖 БОТ";
+            resetMatch();
+        });
+        document.getElementById("modeMulti").addEventListener("click", () => {
+            gameMode = "multiplayer";
+            document.getElementById("modeMulti").classList.add("active");
+            document.getElementById("modeBot").classList.remove("active");
+            document.getElementById("gamePlayer2Label").innerText = "👥 ИГРОК 2 (стрелки)";
+            resetMatch();
+        });
+        document.getElementById("resetGameBtn").onclick = () => resetMatch();
+        document.getElementById("backToMenuGameBtn").onclick = () => document.querySelector('.tab-btn[data-tab="menu"]').click();
+        document.getElementById("playNowBtn").onclick = () => document.querySelector('.tab-btn[data-tab="game"]').click();
+        document.getElementById("profileNick").addEventListener("change", (e) => {
+            profile.nick = e.target.value.trim() || "Хоккеист";
+            allProfiles[profile.friendCode] = {
+                ...allProfiles[profile.friendCode],
+                nick: profile.nick
+            };
+            saveAllData();
+            updateUI();
+        });
+        document.getElementById("uploadPhotoBtn").onclick = () => document.getElementById("avatarUpload").click();
+        document.getElementById("avatarUpload").addEventListener("change", (e) => {
+            if(e.target.files[0]) {
+                let reader = new FileReader();
+                reader.onload = (ev) => {
+                    profile.avatarType = "image";
+                    profile.avatarData = ev.target.result;
+                    allProfiles[profile.friendCode] = {
+                        ...allProfiles[profile.friendCode],
+                        avatarType: "image",
+                        avatarData: ev.target.result
+                    };
+                    saveAllData();
+                    updateAvatarDisplay();
+                    showToast("Аватар загружен!");
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+        document.getElementById("resetAvatarBtn").onclick = () => {
+            profile.avatarType = "emoji";
+            profile.avatarData = "🏒";
+            allProfiles[profile.friendCode] = {
+                ...allProfiles[profile.friendCode],
+                avatarType: "emoji",
+                avatarData: "🏒"
+            };
+            saveAllData();
+            updateAvatarDisplay();
+            showToast("Аватар сброшен");
+        };
+        document.getElementById("addFriendBtn").onclick = () => {
+            let code = document.getElementById("addFriendCode").value.trim().toUpperCase();
+            if(!code) return;
+            addFriendByCode(code);
+        };
+        document.getElementById("searchFriendBtn").onclick = () => {
+            let code = document.getElementById("addFriendCode").value.trim().toUpperCase();
+            searchByCode(code);
+        };
+        document.getElementById("createClanBtn").onclick = () => {
+            let clanName = prompt("Название клана:");
+            if(clanName && clanName.trim()) {
+                profile.clan = { name: clanName.trim(), code: generateFriendCode(), members: [] };
+                saveAllData();
+                renderClan();
+                showToast(`Клан "${clanName}" создан! Код клана: ${profile.clan.code}`);
+            }
+        };
+        document.getElementById("joinClanBtn").onclick = () => {
+            let code = document.getElementById("clanCodeInput").value.trim().toUpperCase();
+            if(code && code !== profile.clan.code) {
+                profile.clan = { name: "Клан " + code, code: code, members: [] };
+                saveAllData();
+                renderClan();
+                showToast(`Вы вступили в клан ${profile.clan.name}`);
+            } else if(code === profile.clan.code) {
+                showToast("Вы уже в этом клане");
+            } else {
+                showToast("Введите код клана");
+            }
+        };
+        let btns = document.querySelectorAll(".tab-btn");
+        let tabs = document.querySelectorAll(".tab-content");
+        btns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                let tabId = btn.dataset.tab;
+                tabs.forEach(t => t.classList.remove("active"));
+                document.getElementById(tabId+"Tab").classList.add("active");
+                btns.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                if(tabId === "game" && !canvas) initGameCanvas();
+                if(tabId === "rankings") renderRankings();
+            });
+        });
+    }
+
+    function showToast(msg, dur=2000) {
+        let old = document.querySelector(".toast");
+        if(old) old.remove();
+        let div = document.createElement("div");
+        div.className = "toast";
+        div.innerText = msg;
+        document.body.appendChild(div);
+        setTimeout(()=>div.remove(), dur);
+    }
+
+    loadAllData();
+    updateUI();
+    initEvents();
+    initGameCanvas();
+</script>
+</body>
+</html>
